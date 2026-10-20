@@ -1,111 +1,59 @@
-# Sesi 5: Human-Computer Interaction (HCI) & Data Visualization
-**Implementasi *Dashboard* Peringatan Dini Berbasis Reduksi Beban Kognitif**
+# Reduksi Beban Kognitif (HCI) pada Dashboard Peringatan Dini Bencana
 
-## 📖 Deskripsi Studi Kasus
-Dalam sistem berisiko tinggi seperti mitigasi bencana atau instalasi gawat darurat, kegagalan antarmuka dalam menyajikan informasi dapat berakibat fatal. *Dashboard* konvensional sering kali menampilkan seluruh metrik sensor secara bersamaan (banjir data / *chartjunk*), yang justru memicu kelumpuhan analisis (*analysis paralysis*) dan kelelahan mental (*extraneous load*) pada operator di detik-detik kritis.
+## Deskripsi
 
-Studi kasus ini mendemonstrasikan implementasi antarmuka *dashboard* berbasis web yang secara ketat mematuhi prinsip psikologi kognitif dan 10 Heuristik Jacob Nielsen. Antarmuka ini dibangun menggunakan kerangka kerja reaktif (Vue.js) dan dipoles dengan gaya utiliter (Tailwind CSS) untuk mengeksekusi mantra desain visual: *"Overview first, detail on demand"*.
+Proyek ini merupakan purwarupa dan studi kasus penerapan Interaksi Manusia dan Komputer (IMK) dalam merancang antarmuka aplikasi *mission-critical*.
+Proyek ini mengadaptasi materi praktisi mengenai prinsip psikologi kognitif dan evaluasi UI/UX, dengan fokus khusus pada eliminasi *chartjunk* (hiasan visual berlebih) dan manajemen *Extraneous Load* (beban mental tambahan) yang dapat mengganggu pengambilan keputusan dalam situasi bertekanan tinggi.
 
-## 🎯 Tujuan Eksekusi
-1. **Reduksi Extraneous Load:** Menghilangkan elemen visual yang tidak esensial (seperti batas tabel yang tebal atau animasi berlebihan) yang dapat mendistraksi fokus operator.
-2. **Implementasi *Overview First*:** Menyajikan status makro (Tingkat Bahaya) sebagai informasi utama yang mendominasi hierarki visual.
-3. **Implementasi *Detail on Demand*:** Menyembunyikan metrik teknis sensor (seperti kecepatan milidetik seismograf atau tekanan air) di balik interaksi, sehingga layar tetap bersih namun data teknis tetap tersedia jika situasi menuntut eskalasi.
-4. **Pencegahan Kesalahan (Error Prevention):** Menerapkan tombol aksi kritis dengan konfirmasi langkah ganda yang tertegas oleh palet warna (merah untuk aksi destruktif/darurat).
+## Tujuan
 
-## 💻 Implementasi Kode (Vue 3 Composition API & Tailwind CSS)
-Berikut adalah simulasi komponen antarmuka yang dapat dijalankan pada *file* komponen Vue tunggal `EmergencyDashboard.vue`.
+Tujuan proyek ini adalah:
+1. Merancang arsitektur antarmuka sistem peringatan dini bencana yang bebas dari elemen visual yang membingungkan.
+2. Mengimplementasikan prinsip hierarki informasi: *"Overview first, zoom and filter, then detail on demand"* menggunakan ekosistem *frontend* modern (Vue 3 dan Tailwind CSS).
+3. Mengevaluasi kebergunaan desain melalui parameter pencegahan kesalahan (*Error Prevention*) dan visibilitas status sistem (*Visibility of System Status*) berdasarkan Heuristik Jacob Nielsen.
+4. Menyimulasikan pergantian *state* kedaruratan (*Aman* ke *Bahaya*) secara reaktif untuk menguji efisiensi komunikasi visual antarmuka.
 
-```html
-<template>
-  <!-- Layout Utilitarian: Warna latar yang netral untuk mengurangi kelelahan mata -->
-  <div class="min-h-screen bg-gray-50 p-8 font-sans">
-    
-    <header class="mb-8 border-b pb-4">
-      <h1 class="text-2xl font-bold text-gray-800">Sistem Peringatan Dini Bencana Pusat</h1>
-      <p class="text-sm text-gray-500">Live Status Monitor - Zona Pesisir Barat</p>
-    </header>
+## Studi Kasus
 
-    <!-- 1. OVERVIEW FIRST: Banner Status Makro -->
-    <div 
-      :class="statusBencana === 'BAHAYA' ? 'bg-red-100 border-red-500 text-red-800' : 'bg-green-50 border-green-400 text-green-800'"
-      class="border-l-4 p-6 rounded-md mb-8 transition-colors duration-300 shadow-sm"
-    >
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-lg font-semibold tracking-wide">STATUS SAAT INI: {{ statusBencana }}</h2>
-          <p class="text-sm mt-1 opacity-90">{{ pesanStatus }}</p>
-        </div>
-        
-        <!-- Tombol Aksi Kritis: Visibilitas Sistem (Visibility of System Status) -->
-        <button 
-          v-if="statusBencana === 'BAHAYA'"
-          @click="toggleSiren"
-          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded shadow-lg flex items-center gap-2"
-        >
-          <span class="animate-pulse">⚠️</span> AKTIFKAN SIRINE EVAKUASI
-        </button>
-      </div>
-    </div>
+Operator di pusat komando mitigasi bencana saat ini memantau aliran data dari puluhan sensor alam (seismograf, peringatan dini tsunami, sensor angin) secara bersamaan. *Dashboard* konvensional menampilkan seluruh metrik teknis dan grafik fluktuasi secara bertumpuk di satu layar utama. 
+Pada saat terjadi gempa bumi (detik-detik kritis), lonjakan grafik yang berkedip dan data yang tumpang tindih ini menyebabkan *Extraneous Load* pada otak operator, memicu kelumpuhan analisis (*analysis paralysis*), dan memperlambat waktu respons aktivasi sirine evakuasi.
+Melalui arsitektur UI baru yang diusulkan ini, layar utama hanya akan menampilkan satu kesimpulan status makro (Aman/Waspada/Bahaya). Metrik sensor mentah (angka *Richter Scale*, tekanan barometer) akan disembunyikan menggunakan prinsip *Detail on Demand*, dan hanya dimunculkan secara instan jika sistem mendeteksi anomali.
 
-    <!-- 2. DETAIL ON DEMAND: Kontrol Akordion untuk Metrik Sensor -->
-    <section class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-      <button 
-        @click="showSensorDetails = !showSensorDetails"
-        class="w-full flex justify-between items-center p-4 bg-gray-100 hover:bg-gray-200 transition focus:outline-none"
-      >
-        <span class="font-medium text-gray-700">🔍 Rincian Metrik Sensor (Detail on Demand)</span>
-        <span class="text-gray-500">{{ showSensorDetails ? 'Tutup ▲' : 'Buka ▼' }}</span>
-      </button>
+## Metodologi Antarmuka
 
-      <div v-show="showSensorDetails" class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Metrik tanpa chartjunk, langsung ke inti data -->
-        <div class="border p-4 rounded bg-gray-50">
-          <p class="text-xs text-gray-500 uppercase tracking-wider">Aktivitas Seismik</p>
-          <p class="text-2xl font-bold text-gray-800 mt-1">4.2 <span class="text-sm font-normal text-gray-500">SR</span></p>
-        </div>
-        <div class="border p-4 rounded bg-gray-50">
-          <p class="text-xs text-gray-500 uppercase tracking-wider">Muka Air Laut</p>
-          <p class="text-2xl font-bold text-gray-800 mt-1">+1.5 <span class="text-sm font-normal text-gray-500">meter (Surut)</span></p>
-        </div>
-        <div class="border p-4 rounded bg-gray-50">
-          <p class="text-xs text-gray-500 uppercase tracking-wider">Kecepatan Angin</p>
-          <p class="text-2xl font-bold text-gray-800 mt-1">12 <span class="text-sm font-normal text-gray-500">km/h</span></p>
-        </div>
-      </div>
-    </section>
+Arsitektur antarmuka dibangun dengan panduan psikologi kognitif:
+1. **Gestalt Principles:** Mengelompokkan area peringatan secara terpisah dari area rincian metrik teknis.
+2. **Utilitarian Design:** Memanfaatkan ruang kosong (*white space*) dan membuang garis batas tabel yang tebal (mengikuti prinsip minimalisme Edward Tufte).
+3. **Reactivity & State Management:** Menggunakan *binding* status reaktif (Vue.js) agar warna layar (*green/red*) dan tombol aksi kritis (*Trigger Siren*) berubah seketika tanpa perlu me-*refresh* halaman browser.
 
-    <!-- Fitur Simulasi untuk Pengujian Heuristik -->
-    <div class="mt-12 pt-6 border-t border-gray-200 text-center">
-      <p class="text-xs text-gray-400 mb-4">-- Panel Simulasi Pengujian --</p>
-      <button 
-        @click="simulasiGempa"
-        class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-900"
-      >
-        Trigger Simulasi Darurat
-      </button>
-    </div>
+## Evaluasi
 
-  </div>
-</template>
+Berbeda dengan proyek analitika data, evaluasi proyek ini didasarkan pada metrik interaksi (IMK):
+*   *Time to Decision:* (Simulasi) Kecepatan operator memahami status utama dalam pandangan pertama (direpresentasikan oleh ukuran *banner* status yang dominan).
+*   *Error Prevention Rate:* Pencegahan *misclick* melalui penyembunyian tombol sirine saat kondisi aman, dan penambahan layer konfirmasi (diwakili fungsi *Alert*) saat kondisi darurat.
 
-<script setup>
-import { ref } from 'vue'
+## Teknologi
 
-// Reaktivitas State
-const statusBencana = ref('AMAN')
-const pesanStatus = ref('Seluruh metrik sensor berada dalam ambang batas normal.')
-const showSensorDetails = ref(false)
+*   Vue 3 (Composition API / CDN Concept)
+*   Tailwind CSS (Utility-First Styling)
+*   HTML/JS Murni (Untuk kemudahan eksekusi tanpa instalasi NodeJS bagi evaluator)
 
-// Logika Bisnis Interaktif
-const simulasiGempa = () => {
-  statusBencana.value = 'BAHAYA'
-  pesanStatus.value = 'PERINGATAN: Anomali seismik tinggi terdeteksi. Segera evaluasi potensi tsunami.'
-  // Sistem otomatis membuka rincian (Detail on Demand) saat darurat untuk mempercepat analisis operator
-  showSensorDetails.value = true 
-}
+## Cara Menjalankan
 
-const toggleSiren = () => {
-  alert('Sistem: Konfirmasi ulang! Apakah Anda yakin ingin memicu sirine evakuasi pesisir?')
-  // Menerapkan prinsip Error Prevention (Pencegahan Kesalahan fatal)
-}
-</script>
+Karena ini berfokus pada antarmuka *frontend*, proyek ini tidak memerlukan Google Colab.
+1. Unduh file `emergency_dashboard_hci.html`.
+2. Buka file tersebut langsung menggunakan peramban web modern apa pun (Chrome, Edge, Firefox). File ini memuat Vue.js dan Tailwind secara langsung dari *Content Delivery Network* (CDN).
+3. Uji coba antarmuka dengan menekan tombol simulasi peringatan darurat di bagian bawah untuk melihat pergantian *state* kognitif.
+
+## Kesimpulan
+Proyek ini mendemonstrasikan bahwa dalam perancangan perangkat lunak untuk keselamatan publik, "desain yang baik" bukanlah desain yang cantik, melainkan desain yang paling cepat dipahami oleh otak manusia di bawah tekanan.
+Penggunaan kerangka kerja reaktif seperti Vue.js yang dipadukan dengan Tailwind CSS memungkinkan arsitek sistem membangun dashboard yang fungsional, bersih, dan mematuhi hukum Interaksi Manusia dan Komputer tanpa harus berkompromi pada performa penguraian data real-time.
+
+
+## Struktur Repository
+
+```text
+sesi-5-hci/
+├── emergency_dashboard_hci.html
+├── README.md
+└── requirements.txt
